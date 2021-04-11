@@ -12,13 +12,16 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   private
   
   def authorization
-    @user = User.from_omniauth(request.env["omniauth.auth"])
-    # Userモデルから返ってきた値を＠userに代入する。ビューで取得した「名前」と「メールアドレス」を表示させる為
+    sns_info = User.from_omniauth(request.env["omniauth.auth"])
+    @user = sns_info[:user]
+    # @userには「nickname」と「email」の情報をもたせる。
     if @user.persisted? 
     #ユーザー情報が登録済みなので、新規登録ではなくログイン処理を行う
       sign_in_and_redirect @user, event: :authentication
     else 
     #ユーザー情報が未登録なので、新規登録画面へ遷移する
+      @sns_id = sns_info[:sns].id
+      # SNS認証の判断はsns_idで行う為、idだけビューで扱えるようにします
       render template: 'devise/registrations/new'
     end
   end
