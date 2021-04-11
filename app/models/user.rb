@@ -21,6 +21,6 @@ class User < ApplicationRecord
     sns.user = user
     sns.save
   end
-  user
+  { user: user, sns: sns } # SNS認証を行ったかの判断をするために、snsに入っているsns_idをビューで扱えるようにするため、コントローラーに渡す
   end
 end
