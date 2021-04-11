@@ -3,17 +3,25 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   def facebook
     authorization
-   end
+  end
   
-   def google_oauth2
+  def google_oauth2
     authorization
-   end
+  end
   
-   private
+  private
   
-   def authorization
-     @user = User.from_omniauth(request.env["omniauth.auth"])
-   end
+  def authorization
+    @user = User.from_omniauth(request.env["omniauth.auth"])
+    # Userモデルから返ってきた値を＠userに代入する。ビューで取得した「名前」と「メールアドレス」を表示させる為
+    if @user.persisted? 
+    #ユーザー情報が登録済みなので、新規登録ではなくログイン処理を行う
+      sign_in_and_redirect @user, event: :authentication
+    else 
+    #ユーザー情報が未登録なので、新規登録画面へ遷移する
+      render template: 'devise/registrations/new'
+    end
+  end
   # You should configure your model like this:
   # devise :omniauthable, omniauth_providers: [:twitter]
 
